@@ -125,6 +125,7 @@ Settings are read from the environment and from `.env`. Command-line flags take 
 
 | Variable                   | Default                                 | Description                          |
 |----------------------------|-----------------------------------------|--------------------------------------|
+| `MCP_TRANSPORT`            | `stdio`                                 | Transport: `stdio` or `http` (`--mode`) |
 | `MCP_HOST`                 | `0.0.0.0`                               | Host to bind to in HTTP mode (`--host`) |
 | `MCP_PORT`                 | `3000`                                  | Port in HTTP mode (`--port`)         |
 | `MCP_AUTH_ENABLED`         | `true`                                  | Require an auth provider in HTTP mode; set `false` (or `--no-auth`) to serve without one |
@@ -132,7 +133,6 @@ Settings are read from the environment and from `.env`. Command-line flags take 
 | `BIBLE_DEFAULT_VERSION`    | `ESV`                                   | Version used when none is requested  |
 | `BIBLE_TIMEOUT`            | `30`                                    | HTTP request timeout in seconds      |
 
-The transport is always taken from `--mode`, which defaults to `stdio`.
 
 ## Testing
 
