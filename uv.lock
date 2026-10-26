@@ -836,7 +836,7 @@ dev = [
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.12.0" },
     { name = "httpx", specifier = ">=0.25.0" },
-    { name = "mcp-service-kit", git = "https://github.com/geosp/mcp-service-kit?rev=v0.1.0" },
+    { name = "mcp-service-kit", git = "https://github.com/geosp/mcp-service-kit?rev=v0.2.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -847,8 +847,8 @@ dev = [
 
 [[package]]
 name = "mcp-service-kit"
-version = "0.1.0"
-source = { git = "https://github.com/geosp/mcp-service-kit?rev=v0.1.0#1c9a7b15059895414a95770ebce64acb7b53ba4a" }
+version = "0.2.0"
+source = { git = "https://github.com/geosp/mcp-service-kit?rev=v0.2.0#15e3170b05d6cd137511cdd24098f1d328071571" }
 dependencies = [
     { name = "fastmcp" },
     { name = "pydantic" },

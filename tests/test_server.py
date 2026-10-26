@@ -5,6 +5,7 @@ Uses an in-memory FastMCP client against the server built by the kit.
 """
 
 import httpx
+import pytest
 from fastmcp import Client
 from mcp_service_kit import BaseServerConfig
 
@@ -78,3 +79,22 @@ async def test_get_passage_reports_unparseable_page(make_service):
 
     assert result.data["success"] is False
     assert result.data["error"] == "Could not parse passage text"
+
+
+def test_http_requires_no_auth_without_provider(make_service):
+    server = BibleMCPServer(
+        BaseServerConfig(transport="http"), BibleMCPService(make_service())
+    )
+
+    with pytest.raises(ValueError, match="--no-auth"):
+        server.create_mcp_app()
+
+
+def test_http_starts_with_auth_disabled(make_service):
+    server = BibleMCPServer(
+        BaseServerConfig(transport="http", auth_enabled=False),
+        BibleMCPService(make_service()),
+    )
+
+    assert server.create_mcp_app() is not None
+    assert server.http_endpoint_url() == "http://0.0.0.0:3000/mcp"

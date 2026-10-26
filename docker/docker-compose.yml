@@ -1,4 +1,4 @@
-version: '3.8'
+name: mcp-bible
 
 services:
   mcp-bible:
@@ -8,9 +8,9 @@ services:
     volumes:
       - ..:/app
     working_dir: /app
-    command: ["--from", ".", "mcp-bible", "--mode", "http"]
+    command: ["--from", ".", "mcp-bible", "--mode", "http", "--no-auth"]
     ports:
-      - "3000:3000"
+      - "3018:3000"
     environment:
       - UV_CACHE_DIR=/tmp/uv-cache
     restart: unless-stopped

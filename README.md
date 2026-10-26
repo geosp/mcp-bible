@@ -5,7 +5,7 @@ A Model Context Protocol (MCP) server that provides Bible passage retrieval, bui
 This server lets AI assistants read Bible passages from various translations. It runs in two modes:
 
 - **`--mode stdio`** (default): MCP over stdin/stdout, for local AI assistant integration
-- **`--mode http`**: MCP over streamable HTTP at `/mcp/`, for networked access
+- **`--mode http`**: MCP over streamable HTTP at `/mcp`, for networked access
 
 ## Features
 
@@ -84,12 +84,12 @@ Use this mode to integrate directly with AI assistants such as GitHub Copilot or
 ### Mode 2: http - MCP over HTTP
 
 ```bash
-uv run mcp-bible --mode http --port 3000
+uv run mcp-bible --mode http --port 3000 --no-auth
 ```
 
-This serves MCP at `http://localhost:3000/mcp/` for networked AI assistants.
+This serves MCP at `http://localhost:3000/mcp` for networked AI assistants.
 
-No authentication provider is configured, so the server logs a warning and serves without auth. To protect the endpoint, override `create_auth_provider()` in `mcp_bible/server.py` (see [Authentication](https://github.com/geosp/mcp-service-kit#authentication) in the kit's README).
+No authentication provider is configured, so HTTP mode needs `--no-auth` (or `MCP_AUTH_ENABLED=false`). Without it, mcp-service-kit refuses to start rather than serve the tools unauthenticated. To protect the endpoint, override `create_auth_provider()` in `mcp_bible/server.py` (see [Authentication](https://github.com/geosp/mcp-service-kit#authentication) in the kit's README).
 
 ### Connect an MCP Client
 
@@ -101,7 +101,7 @@ You can test the MCP tools by connecting GitHub Copilot or another MCP client:
   "servers": {
     "bible": {
       "type": "http",
-      "url": "http://localhost:3000/mcp/"
+      "url": "http://localhost:3000/mcp"
     }
   }
 }
@@ -122,8 +122,8 @@ uv run mcp-bible --help
 
 # Usage examples:
 uv run mcp-bible                                  # stdio mode (default)
-uv run mcp-bible --mode http --port 4000          # HTTP on port 4000
-uv run mcp-bible --mode http --log-level DEBUG    # verbose logging
+uv run mcp-bible --mode http --no-auth --port 4000          # HTTP on port 4000
+uv run mcp-bible --mode http --no-auth --log-level DEBUG    # verbose logging
 ```
 
 ### Environment Variables
@@ -134,7 +134,7 @@ Settings are read from the environment and from `.env`. Command-line flags take 
 |----------------------------|-----------------------------------------|--------------------------------------|
 | `MCP_HOST`                 | `0.0.0.0`                               | Host to bind to in HTTP mode (`--host`) |
 | `MCP_PORT`                 | `3000`                                  | Port in HTTP mode (`--port`)         |
-| `MCP_AUTH_ENABLED`         | `true`                                  | Use the auth provider in HTTP mode (`--no-auth`) |
+| `MCP_AUTH_ENABLED`         | `true`                                  | Require an auth provider in HTTP mode; set `false` (or `--no-auth`) to serve without one |
 | `BIBLE_API_URL`            | `https://www.biblegateway.com/passage/` | BibleGateway passage URL             |
 | `BIBLE_DEFAULT_VERSION`    | `ESV`                                   | Version used when none is requested  |
 | `BIBLE_SUPPORTED_VERSIONS` | `ESV,NIV,KJV,NASB,NKJV,NLT,AMP,MSG`     | Comma-separated list                 |
@@ -152,9 +152,9 @@ uv run pytest
 Live smoke test against a running HTTP server (this calls BibleGateway.com):
 
 ```bash
-uv run mcp-bible --mode http --port 3000 &
+uv run mcp-bible --mode http --port 3000 --no-auth &
 uv run python examples/client_example.py "John 3:16"
-uv run python examples/client_example.py --url http://localhost:4000/mcp/ "Romans 8:28"
+uv run python examples/client_example.py --url http://localhost:4000/mcp "Romans 8:28"
 ```
 
 ## Project Structure

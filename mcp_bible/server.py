@@ -6,7 +6,7 @@ BaseMCPServer from mcp-service-kit.
 
 Run it with:
     mcp-bible --mode stdio
-    mcp-bible --mode http --port 3000
+    mcp-bible --mode http --port 3000 --no-auth
 """
 
 import logging

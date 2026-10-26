@@ -1,6 +1,6 @@
 # MCP Bible Docker Setup
 
-This directory contains Docker Compose configurations that run the MCP Bible server over streamable HTTP (`mcp-bible --mode http`). MCP is served at `http://localhost:3000/mcp/`.
+This directory contains Docker Compose configurations that run the MCP Bible server over streamable HTTP (`mcp-bible --mode http --no-auth`). MCP is served at `http://localhost:3000/mcp`.
 
 ## Available Setups
 
@@ -27,7 +27,7 @@ docker-compose up --build -d
 
 ### Production Mode (Uses published images)
 
-**Note**: Production setups use the published Docker image from GHCR and run the package directly from the GitHub repository using `uvx mcp-bible@git+https://github.com/geosp/mcp-bible.git --mode http`.
+**Note**: Production setups use the published Docker image from GHCR and run the package directly from the GitHub repository using `uvx mcp-bible@git+https://github.com/geosp/mcp-bible.git --mode http --no-auth`.
 
 ```bash
 cd docker
@@ -70,14 +70,14 @@ The service is configured to:
 - Build from the parent directory's Dockerfile
 - Mount the project directory as `/app` for live code changes
 - Expose port 3000 for MCP communication
-- Run `mcp-bible --mode http` (MCP over streamable HTTP at `/mcp/`)
+- Run `mcp-bible --mode http --no-auth` (MCP over streamable HTTP at `/mcp`)
 - Use uvx to run the local MCP Bible package
 
 ### Production Setup (docker-compose.prod.yml)
 The service is configured to:
 - Use published image: `ghcr.io/geosp/mcp-bible:main`
 - Expose port 3000 for MCP communication
-- Run `mcp-bible --mode http` (MCP over streamable HTTP at `/mcp/`)
+- Run `mcp-bible --mode http --no-auth` (MCP over streamable HTTP at `/mcp`)
 - No source code mounting required
 
 ## Development
@@ -95,8 +95,8 @@ docker-compose restart mcp-bible
 - If you encounter permission issues, ensure Docker is running and you have proper permissions
 - Check the logs with `docker-compose logs mcp-bible` for detailed error messages
 - The container uses uv for Python package management, which handles dependencies automatically
-- Only the `/mcp/` endpoint is served; there is no REST API or `/health` endpoint
-- The server logs a warning that HTTP runs without authentication; no auth provider is configured
+- Only the `/mcp` endpoint is served; there is no REST API or `/health` endpoint
+- No auth provider is configured, so the compose files pass `--no-auth`; without it the server exits with `Configuration error: HTTP transport has auth enabled...`
 - **Production mode**: Uses `uvx` to run the package directly from the GitHub repository (`git+https://github.com/geosp/mcp-bible.git`)
 - **Versioned deployments**: Use specific version tags (e.g., `:v1.0.0`) for stable, immutable deployments instead of `:main` for bleeding-edge
 
@@ -168,7 +168,7 @@ To use the MCP Bible server with Claude Desktop, you'll need to install and conf
 3. **Edit the configuration file** at `~/.config/mcp-bridge/bible.json`:
    ```json
    {
-     "url": "http://localhost:3000/mcp/"
+     "url": "http://localhost:3000/mcp"
    }
    ```
    Adjust the URL if your server is running on a different host/port.

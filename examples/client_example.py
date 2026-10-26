@@ -6,14 +6,14 @@ Connects to a running server over HTTP, lists its tools and fetches a
 passage. This is a live smoke test: it calls BibleGateway.com.
 
 Requirements:
-    - Server running in HTTP mode: mcp-bible --mode http --port 3000
+    - Server running in HTTP mode: mcp-bible --mode http --port 3000 --no-auth
 
 Usage:
     python examples/client_example.py [--url URL] [PASSAGE]
 
     # Examples:
     python examples/client_example.py "John 3:16"
-    python examples/client_example.py --url http://localhost:4000/mcp/ "Romans 8:28"
+    python examples/client_example.py --url http://localhost:4000/mcp "Romans 8:28"
 """
 
 import sys
@@ -23,7 +23,7 @@ import argparse
 from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 
-DEFAULT_URL = "http://localhost:3000/mcp/"
+DEFAULT_URL = "http://localhost:3000/mcp"
 
 
 async def run_example(url: str = DEFAULT_URL, passage: str = None):
