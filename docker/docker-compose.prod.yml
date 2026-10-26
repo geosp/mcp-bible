@@ -5,7 +5,5 @@ services:
     image: ghcr.io/geosp/mcp-bible:main
     ports:
       - "3000:3000"
-    environment:
-      - MCP_ONLY=true
-    command: ["mcp-bible@git+https://github.com/geosp/mcp-bible.git"]
+    command: ["mcp-bible@git+https://github.com/geosp/mcp-bible.git", "--mode", "http"]
     restart: unless-stopped

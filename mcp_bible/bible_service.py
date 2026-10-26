@@ -2,12 +2,14 @@
 Bible service - Business logic layer
 
 This demonstrates how to implement your core business logic
-separately from MCP/REST concerns.
+separately from MCP concerns.
 """
 
 import httpx
 from bs4 import BeautifulSoup
 import logging
+
+from mcp_bible.config import BibleAPIConfig
 
 logger = logging.getLogger(__name__)
 
@@ -17,34 +19,36 @@ class BibleService:
     Handles Bible passage operations
 
     This is your business logic layer - it knows nothing about
-    MCP or REST APIs, just pure Bible passage functionality.
+    MCP, just pure Bible passage functionality.
     """
 
-    BASE_URL = "https://www.biblegateway.com/passage/"
-    DEFAULT_VERSION = "ESV"
-    DEFAULT_TIMEOUT = 30.0
-
-    def __init__(self, timeout: float = DEFAULT_TIMEOUT):
+    def __init__(
+        self,
+        api_config: BibleAPIConfig,
+        client: httpx.AsyncClient | None = None,
+    ):
         """
         Initialize Bible service
 
         Args:
-            timeout: HTTP request timeout in seconds
+            api_config: Bible API configuration (URL, default version, timeout)
+            client: Optional HTTP client; created lazily if not given
         """
-        self.timeout = timeout
-        self._client: httpx.AsyncClient | None = None
+        self.api_config = api_config
+        self._client = client
 
     async def fetch_passage(
         self,
         passage: str,
-        version: str = DEFAULT_VERSION,
+        version: str | None = None,
     ) -> dict:
         """
         Fetch a Bible passage from BibleGateway.
 
         Args:
             passage: Bible reference(s) (e.g., "John 3:16", "Romans 8", or "John 3:16; Romans 8:28-30")
-            version: Bible translation version (e.g., "ESV", "NIV", "KJV")
+            version: Bible translation version (e.g., "ESV", "NIV", "KJV").
+                Defaults to the configured default version.
 
         Returns:
             dict: Result containing passage text or error
@@ -64,6 +68,8 @@ class BibleService:
             # Multiple passages
             result = await service.fetch_passage("John 3:16; Romans 8:28", "ESV")
         """
+        version = version or self.api_config.default_version
+
         logger.info(
             f"Fetching Bible passage: {passage} ({version})"
         )
@@ -153,7 +159,7 @@ class BibleService:
             httpx.HTTPError: If request fails
         """
         if not self._client:
-            self._client = httpx.AsyncClient(timeout=self.timeout)
+            self._client = httpx.AsyncClient(timeout=self.api_config.timeout)
 
         params = {"search": passage, "version": version}
 
@@ -162,7 +168,7 @@ class BibleService:
         }
 
         response = await self._client.get(
-            self.BASE_URL, params=params, headers=headers
+            self.api_config.api_url, params=params, headers=headers
         )
 
         response.raise_for_status()

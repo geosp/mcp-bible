@@ -1,28 +1,27 @@
 [project]
 name = "mcp-bible"
-version = "1.0.0"
-description = "Bible MCP server using mcp-weather core infrastructure"
-requires-python = ">=3.10"
+version = "2.0.0"
+description = "Bible MCP server built on mcp-service-kit"
+requires-python = ">=3.11"
 authors = [
     {name = "Geovanny F. Fajardo", email = "gffajardo@gmail.com"},
 ]
 dependencies = [
+    # MCP server infrastructure (stdio/HTTP transports, CLI, config)
+    "mcp-service-kit @ git+https://github.com/geosp/mcp-service-kit@v0.1.0",
     # Web scraping and HTTP client
     "httpx>=0.25.0",
     "beautifulsoup4>=4.12.0",
-    # Logging
-    "structlog>=23.0.0",
-    # Alternative: Install from local development copy
-    # To use local version during development, run:
-    #   uv add --editable ../../
-    # This creates an editable install that reflects your local changes
-    # Alternative: Install from PyPI (once published)
-    # "mcp-weather>=0.1.0",
-    "mcp-weather",
 ]
 
 [project.scripts]
 mcp-bible = "mcp_bible.server:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -31,5 +30,6 @@ build-backend = "hatchling.build"
 [tool.hatch.metadata]
 allow-direct-references = true
 
-[tool.uv.sources]
-mcp-weather = { git = "https://github.com/geosp/mcp-weather.git" }
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

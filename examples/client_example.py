@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """
-Test script for Bible MCP Server.
+Example client for Bible MCP Server.
 
-Tests MCP protocol connection and Bible passage tool functionality.
+Connects to a running server over HTTP, lists its tools and fetches a
+passage. This is a live smoke test: it calls BibleGateway.com.
 
 Requirements:
-    - Server running in MCP mode
+    - Server running in HTTP mode: mcp-bible --mode http --port 3000
 
 Usage:
-    python test_bible_mcp.py [PASSAGE]
-    
+    python examples/client_example.py [--url URL] [PASSAGE]
+
     # Examples:
-    python test_bible_mcp.py "John 3:16"
-    python test_bible_mcp.py "Romans 8:28"
+    python examples/client_example.py "John 3:16"
+    python examples/client_example.py --url http://localhost:4000/mcp/ "Romans 8:28"
 """
 
-import os
 import sys
 import asyncio
 import json
@@ -23,12 +23,15 @@ import argparse
 from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 
+DEFAULT_URL = "http://localhost:3000/mcp/"
 
-async def test_bible_mcp(passage: str = None):
+
+async def run_example(url: str = DEFAULT_URL, passage: str = None):
     """
     Test the Bible MCP Server
 
     Args:
+        url: MCP endpoint URL
         passage: Optional Bible passage to test (default: "John 3:16")
     """
 
@@ -37,14 +40,12 @@ async def test_bible_mcp(passage: str = None):
 
     print("🧪 Testing Bible MCP Server")
     print("=" * 70)
-    print(f"🔗 URL: http://localhost:3000/mcp")
+    print(f"🔗 URL: {url}")
     print()
 
     try:
         # Create transport (no auth needed since it's disabled)
-        transport = StreamableHttpTransport(
-            url="http://localhost:3000/mcp"
-        )
+        transport = StreamableHttpTransport(url=url)
 
         print("🔌 Attempting to connect to MCP server...")
         async with Client(transport=transport) as client:
@@ -116,8 +117,9 @@ if __name__ == "__main__":
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="Test Bible MCP Server")
     parser.add_argument("passage", nargs="?", help="Bible passage to test")
+    parser.add_argument("--url", default=DEFAULT_URL, help=f"MCP endpoint URL (default: {DEFAULT_URL})")
     args = parser.parse_args()
 
     # Run the test
-    success = asyncio.run(test_bible_mcp(args.passage))
+    success = asyncio.run(run_example(args.url, args.passage))
     sys.exit(0 if success else 1)

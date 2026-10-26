@@ -5,10 +5,10 @@ Provides the get_passage tool for AI assistants.
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any, Dict, Optional
 
 from fastmcp import FastMCP
-from core.utils import inject_docstring, load_instruction
+from mcp_service_kit.utils import inject_docstring, load_instruction
 
 from mcp_bible.bible_service import BibleService
 from mcp_bible.features.get_passage.models import GetPassageRequest, GetPassageResponse
@@ -26,7 +26,7 @@ def register_tool(mcp: FastMCP, bible_service: BibleService) -> None:
     """
     @mcp.tool()
     @inject_docstring(lambda: load_instruction("instructions.md", __file__))
-    async def get_passage(passage: str, version: str = "ESV") -> Dict[str, Any]:
+    async def get_passage(passage: str, version: Optional[str] = None) -> Dict[str, Any]:
         """Get a Bible passage with comprehensive documentation loaded from instructions.md"""
         try:
             logger.info(f"MCP tool called: get_passage(passage='{passage}', version='{version}')")

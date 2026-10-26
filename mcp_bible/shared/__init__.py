@@ -1,3 +1,0 @@
-"""
-Shared utilities and models
-"""

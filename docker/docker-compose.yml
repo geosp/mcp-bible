@@ -8,10 +8,9 @@ services:
     volumes:
       - ..:/app
     working_dir: /app
-    command: ["--from", ".", "mcp-bible"]
+    command: ["--from", ".", "mcp-bible", "--mode", "http"]
     ports:
       - "3000:3000"
     environment:
       - UV_CACHE_DIR=/tmp/uv-cache
-      - MCP_ONLY=true
     restart: unless-stopped

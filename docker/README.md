@@ -1,17 +1,15 @@
 # MCP Bible Docker Setup
 
-This directory contains Docker Compose configurations to run the MCP Bible server in different modes.
+This directory contains Docker Compose configurations that run the MCP Bible server over streamable HTTP (`mcp-bible --mode http`). MCP is served at `http://localhost:3000/mcp/`.
 
 ## Available Setups
 
-### Development Setups (build locally)
-- **MCP-only Mode** (`docker-compose.yml`): Pure MCP protocol with Streaming HTTP - REST API disabled
-- **REST Mode** (`docker-compose.rest.yml`): Full REST API + MCP protocol support
+### Development Setup (build locally)
+- **`docker-compose.yml`**: Builds the image locally and runs the mounted source code
 
 ### Production Setups (use published images)
-- **MCP-only Mode** (`docker-compose.prod.yml`): Uses published GHCR image for MCP-only mode
-- **REST Mode** (`docker-compose.prod.rest.yml`): Uses published GHCR image for REST mode
-- **Versioned Releases**: Use semantic version tags like `v1.0.0` for stable releases (e.g., `docker-compose.prod.v1.0.0.yml`)
+- **`docker-compose.prod.yml`**: Uses the published GHCR image (`:main`)
+- **Versioned Releases**: Use semantic version tags for stable releases (e.g., `docker-compose.prod.v1.0.0.yml`). Note that `v1.0.0` predates the mcp-service-kit migration and uses the old `MCP_ONLY` settings.
 
 ## Prerequisites
 
@@ -22,40 +20,18 @@ This directory contains Docker Compose configurations to run the MCP Bible serve
 
 ### Development Mode (Recommended for local development)
 
-#### MCP-only Mode (Default)
-For pure MCP protocol communication:
-
 ```bash
 cd docker
 docker-compose up --build -d
 ```
 
-#### REST Mode
-For full API access with health checks and documentation:
-
-```bash
-cd docker
-docker-compose -f docker-compose.rest.yml up --build -d
-```
-
 ### Production Mode (Uses published images)
 
-**Note**: Production setups use the published Docker image from GHCR and run the package directly from the GitHub repository using `uvx mcp-bible@git+https://github.com/geosp/mcp-bible.git`.
-
-#### MCP-only Mode
-For production deployment using published images:
+**Note**: Production setups use the published Docker image from GHCR and run the package directly from the GitHub repository using `uvx mcp-bible@git+https://github.com/geosp/mcp-bible.git --mode http`.
 
 ```bash
 cd docker
 docker-compose -f docker-compose.prod.yml up -d
-```
-
-#### REST Mode
-For production with full API access:
-
-```bash
-cd docker
-docker-compose -f docker-compose.prod.rest.yml up -d
 ```
 
 #### Versioned Releases (Recommended for Production)
@@ -68,32 +44,20 @@ docker-compose -f docker-compose.prod.v1.0.0.yml up -d
 
 ### Check Status
 ```bash
-# Development MCP-only
+# Development
 docker-compose logs -f mcp-bible
 
-# Development REST
-docker-compose -f docker-compose.rest.yml logs -f mcp-bible
-
-# Production MCP-only
+# Production
 docker-compose -f docker-compose.prod.yml logs -f mcp-bible
-
-# Production REST
-docker-compose -f docker-compose.prod.rest.yml logs -f mcp-bible
 ```
 
 ### Stop Services
 ```bash
-# Development MCP-only
+# Development
 docker-compose down
 
-# Development REST
-docker-compose -f docker-compose.rest.yml down
-
-# Production MCP-only
+# Production
 docker-compose -f docker-compose.prod.yml down
-
-# Production REST
-docker-compose -f docker-compose.prod.rest.yml down
 
 # Production versioned
 docker-compose -f docker-compose.prod.v1.0.0.yml down
@@ -101,52 +65,27 @@ docker-compose -f docker-compose.prod.v1.0.0.yml down
 
 ## Configuration
 
-### Development Setups (Local building)
-These setups build the Docker image locally and mount the source code for live development.
-
-#### MCP-only Mode (docker-compose.yml)
+### Development Setup (docker-compose.yml)
 The service is configured to:
 - Build from the parent directory's Dockerfile
 - Mount the project directory as `/app` for live code changes
 - Expose port 3000 for MCP communication
-- Run in Streaming HTTP mode (`MCP_ONLY=true`) for MCP protocol - **REST API endpoints are disabled**
+- Run `mcp-bible --mode http` (MCP over streamable HTTP at `/mcp/`)
 - Use uvx to run the local MCP Bible package
 
-#### REST Mode (docker-compose.rest.yml)
-The service is configured to:
-- Build from the parent directory's Dockerfile
-- Mount the project directory as `/app` for live code changes
-- Expose port 3000 for MCP communication
-- Run with full REST API + MCP protocol support
-- Use uvx to run the local MCP Bible package
-
-### Production Setups (Published images)
-These setups use pre-built images from GitHub Container Registry for faster deployment.
-
-#### MCP-only Mode (docker-compose.prod.yml)
+### Production Setup (docker-compose.prod.yml)
 The service is configured to:
 - Use published image: `ghcr.io/geosp/mcp-bible:main`
 - Expose port 3000 for MCP communication
-- Run in Streaming HTTP mode for pure MCP protocol communication
-- No source code mounting required
-
-#### REST Mode (docker-compose.prod.rest.yml)
-The service is configured to:
-- Use published image: `ghcr.io/geosp/mcp-bible:main`
-- Expose port 3000 for MCP communication
-- Run with full REST API + MCP protocol support
+- Run `mcp-bible --mode http` (MCP over streamable HTTP at `/mcp/`)
 - No source code mounting required
 
 ## Development
 
-For development setups, the volume mount allows you to make changes to the code without rebuilding the container. Simply restart the service after changes:
+For the development setup, the volume mount lets you change the code without rebuilding the container. Restart the service after changes:
 
 ```bash
-# Development MCP-only mode
 docker-compose restart mcp-bible
-
-# Development REST mode
-docker-compose -f docker-compose.rest.yml restart mcp-bible
 ```
 
 **Note**: Production setups use published images and do not support live code reloading.
@@ -154,18 +93,19 @@ docker-compose -f docker-compose.rest.yml restart mcp-bible
 ## Troubleshooting
 
 - If you encounter permission issues, ensure Docker is running and you have proper permissions
-- Check the logs with `docker-compose logs mcp-bible` (or `docker-compose -f docker-compose.rest.yml logs mcp-bible`) for detailed error messages
+- Check the logs with `docker-compose logs mcp-bible` for detailed error messages
 - The container uses uv for Python package management, which handles dependencies automatically
-- **MCP-only mode**: When `MCP_ONLY=true`, REST API endpoints like `/health` are disabled. Only the `/mcp` endpoint is available for MCP protocol communication
-- **REST mode**: Full API access available including `/health`, `/docs`, and `/mcp` endpoints
+- Only the `/mcp/` endpoint is served; there is no REST API or `/health` endpoint
+- The server logs a warning that HTTP runs without authentication; no auth provider is configured
 - **Production mode**: Uses `uvx` to run the package directly from the GitHub repository (`git+https://github.com/geosp/mcp-bible.git`)
 - **Versioned deployments**: Use specific version tags (e.g., `:v1.0.0`) for stable, immutable deployments instead of `:main` for bleeding-edge
 
 ## Environment Variables
 
-You can add environment variables in the `docker-compose.yml` files under the `environment` section if needed for configuration.
+You can add environment variables in the `docker-compose.yml` files under the `environment` section if needed for configuration. See the main [README](../README.md#environment-variables) for the full list.
 
-- `MCP_ONLY=true`: Enables Streaming HTTP mode for MCP protocol communication (used in default `docker-compose.yml`)
+- `MCP_PORT`: Port to listen on inside the container (default `3000`)
+- `BIBLE_DEFAULT_VERSION`: Version used when none is requested (default `ESV`)
 - `UV_CACHE_DIR=/tmp/uv-cache`: Sets the cache directory for uv package manager
 
 ## Advanced: LXC Environment Setup
@@ -188,25 +128,15 @@ lxc.mount.auto = proc:rw sys:rw
 Use `sudo` with podman-compose commands:
 
 ```bash
-# Development MCP-only mode
+# Development mode
 sudo podman-compose up --build -d
 sudo podman-compose logs -f mcp-bible
 sudo podman-compose down
 
-# Development REST mode
-sudo podman-compose -f docker-compose.rest.yml up --build -d
-sudo podman-compose -f docker-compose.rest.yml logs -f mcp-bible
-sudo podman-compose -f docker-compose.rest.yml down
-
-# Production MCP-only mode
+# Production mode
 sudo podman-compose -f docker-compose.prod.yml up -d
 sudo podman-compose -f docker-compose.prod.yml logs -f mcp-bible
 sudo podman-compose -f docker-compose.prod.yml down
-
-# Production REST mode
-sudo podman-compose -f docker-compose.prod.rest.yml up -d
-sudo podman-compose -f docker-compose.prod.rest.yml logs -f mcp-bible
-sudo podman-compose -f docker-compose.prod.rest.yml down
 
 # Production versioned mode
 sudo podman-compose -f docker-compose.prod.v1.0.0.yml up -d
@@ -238,7 +168,7 @@ To use the MCP Bible server with Claude Desktop, you'll need to install and conf
 3. **Edit the configuration file** at `~/.config/mcp-bridge/bible.json`:
    ```json
    {
-     "url": "http://localhost:3000/mcp"
+     "url": "http://localhost:3000/mcp/"
    }
    ```
    Adjust the URL if your server is running on a different host/port.
