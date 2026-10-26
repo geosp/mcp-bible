@@ -12,15 +12,8 @@ This server lets AI assistants read Bible passages from various translations. It
 ### MCP Tools (for AI assistants)
 - `get_passage(passage, version)`: retrieves Bible passages. Pass several references separated by semicolons (e.g., "John 3:16; Romans 8:28") to get them all at once. If `version` is omitted, the configured default (ESV) is used.
 
-### Supported Bible Versions
-- ESV (English Standard Version)
-- NIV (New International Version)
-- KJV (King James Version)
-- NASB (New American Standard Bible)
-- NKJV (New King James Version)
-- NLT (New Living Translation)
-- AMP (Amplified Bible)
-- MSG (The Message)
+### Bible Versions
+`version` is passed to BibleGateway as-is, so any version abbreviation it offers works (e.g. `ESV`, `NIV`, `KJV`, `NASB`, `LSB`); there is no list to maintain here. See [BibleGateway's versions page](https://www.biblegateway.com/versions/). If a version isn't available, the tool returns `success: false` with the error.
 
 ## Installation
 
@@ -137,7 +130,6 @@ Settings are read from the environment and from `.env`. Command-line flags take 
 | `MCP_AUTH_ENABLED`         | `true`                                  | Require an auth provider in HTTP mode; set `false` (or `--no-auth`) to serve without one |
 | `BIBLE_API_URL`            | `https://www.biblegateway.com/passage/` | BibleGateway passage URL             |
 | `BIBLE_DEFAULT_VERSION`    | `ESV`                                   | Version used when none is requested  |
-| `BIBLE_SUPPORTED_VERSIONS` | `ESV,NIV,KJV,NASB,NKJV,NLT,AMP,MSG`     | Comma-separated list                 |
 | `BIBLE_TIMEOUT`            | `30`                                    | HTTP request timeout in seconds      |
 
 The transport is always taken from `--mode`, which defaults to `stdio`.

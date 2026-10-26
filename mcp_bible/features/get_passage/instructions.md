@@ -21,9 +21,8 @@ This tool retrieves Bible passages from BibleGateway.com, supporting multiple Bi
 
 ### version (optional)
 - **Type**: string  
-- **Default**: "ESV"
-- **Description**: Bible translation version
-- **Supported versions**: ESV, NIV, KJV, NASB, NKJV, NLT, AMP, MSG
+- **Default**: the server's configured default (ESV unless changed)
+- **Description**: Bible translation version. Any BibleGateway version abbreviation works and is passed through as-is (e.g. `ESV`, `NIV`, `KJV`, `NASB`, `LSB`). See https://www.biblegateway.com/versions/ for the full list.
 
 ## Usage Examples
 
@@ -68,16 +67,7 @@ Returns a structured response containing:
 - `text`: The passage text (cleaned and formatted)
 - `error`: Error message if request failed
 
-## Supported Bible Versions
-
-- **ESV** - English Standard Version (default)
-- **NIV** - New International Version
-- **KJV** - King James Version
-- **NASB** - New American Standard Bible
-- **NKJV** - New King James Version
-- **NLT** - New Living Translation
-- **AMP** - Amplified Bible
-- **MSG** - The Message
+If BibleGateway doesn't offer the requested version, the response has `success: false` and the error in `error`.
 
 ## When to Use This Tool
 
